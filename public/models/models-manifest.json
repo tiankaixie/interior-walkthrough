@@ -1,0 +1,18 @@
+{
+  "models": [
+    {
+      "id": "dji-capture-0158",
+      "name": "DJI Capture 0158",
+      "path": "/models/DJI_20251230163815_0158_D_stabilized.glb",
+      "type": "glb",
+      "description": "DJI stabilized capture point cloud"
+    },
+    {
+      "id": "gallery-scene",
+      "name": "Gallery Scene",
+      "path": "/models/gallery/scene.gltf",
+      "type": "gltf",
+      "description": "Gallery interior scene"
+    }
+  ]
+}
