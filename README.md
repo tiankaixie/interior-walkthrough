@@ -1,70 +1,88 @@
-# Getting Started with Create React App
+Once the contents of this folder change, update this document.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# deck.gl GLB Viewer
 
-## Available Scripts
+A WebGPU-accelerated 3D GLB/GLTF model viewer built with deck.gl and React. Features point cloud visualization, first-person navigation controls, and a modern control panel.
 
-In the project directory, you can run:
+## Architecture
 
-### `npm start`
+React application using deck.gl v9 with WebGPU support (falls back to WebGL2) for rendering GLB/GLTF models. Supports both mesh and point cloud visualization modes with WASD + mouse navigation.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## File Registry
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+| Name | Status | Core Function |
+|------|--------|---------------|
+| src/App.js | Active | Main application component |
+| src/App.css | Active | Global styles |
+| src/components/ | Active | UI components (DeckGLViewer, ModelSelector, ControlPanel) |
+| src/hooks/ | Active | Custom hooks (useFirstPersonControls, useModelLoader, usePointCloudExtractor) |
+| public/models/ | Active | GLB/GLTF model storage |
+| public/models/models-manifest.json | Active | Model listing for dropdown selection |
 
-### `npm test`
+## Features
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- **WebGPU/WebGL2 Rendering**: Automatically uses best available renderer
+- **Model Selection**: Dropdown to select from available GLB/GLTF models
+- **Dual View Modes**: Switch between mesh and point cloud visualization
+- **First-Person Controls**: WASD movement + mouse look
+- **Camera Modes**: Free flight and physics-based movement
+- **Control Panel**: Adjust point size, color mode, LOD, rendering quality
 
-### `npm run build`
+## Controls
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+| Key | Action |
+|-----|--------|
+| W/A/S/D | Move forward/left/backward/right |
+| Space | Ascend (free flight) / Jump (physics) |
+| Shift | Descend (free flight) |
+| Mouse | Look around (after clicking to lock) |
+| ESC | Unlock cursor |
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Getting Started
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+# Install dependencies
+yarn install
 
-### `npm run eject`
+# Start development server
+yarn start
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+# Build for production
+yarn build
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Adding New Models
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+1. Add your GLB/GLTF file to `public/models/`
+2. Update `public/models/models-manifest.json`:
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```json
+{
+  "models": [
+    {
+      "id": "your-model-id",
+      "name": "Display Name",
+      "path": "/models/your-model.glb",
+      "type": "glb",
+      "description": "Optional description"
+    }
+  ]
+}
+```
 
-## Learn More
+## Technology Stack
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- React 18
+- deck.gl v9 (WebGPU/WebGL2)
+- luma.gl v9 (WebGPU adapter)
+- loaders.gl (GLB/GLTF loading)
+- cannon-es (physics, optional)
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Browser Support
 
-### Code Splitting
+- Chrome 113+ (WebGPU)
+- Edge 113+ (WebGPU)
+- Firefox (WebGL2 fallback)
+- Safari (WebGL2 fallback)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+WebGPU requires HTTPS in production (localhost works for development).
