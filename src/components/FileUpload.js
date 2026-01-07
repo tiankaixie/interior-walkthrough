@@ -6,6 +6,7 @@
  */
 
 import React, { useState, useRef } from 'react';
+import { upload } from '@vercel/blob/client';
 import './FileUpload.css';
 
 export function FileUpload({ onUploadComplete }) {
@@ -31,46 +32,31 @@ export function FileUpload({ onUploadComplete }) {
     setProgress(0);
 
     try {
-      // Use PUT with streaming - simpler and avoids multipart parsing issues
-      const xhr = new XMLHttpRequest();
-
-      xhr.upload.addEventListener('progress', (e) => {
-        if (e.lengthComputable) {
-          setProgress(Math.round((e.loaded / e.total) * 100));
-        }
+      // Use Vercel Blob client upload - supports large files (up to 500MB)
+      const blob = await upload(`models/${file.name}`, file, {
+        access: 'public',
+        handleUploadUrl: '/api/upload-url',
+        onUploadProgress: (progressEvent) => {
+          setProgress(Math.round((progressEvent.loaded / progressEvent.total) * 100));
+        },
       });
 
-      const response = await new Promise((resolve, reject) => {
-        xhr.onload = () => {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            try {
-              resolve(JSON.parse(xhr.responseText));
-            } catch {
-              reject(new Error('Invalid response from server'));
-            }
-          } else {
-            try {
-              const err = JSON.parse(xhr.responseText);
-              reject(new Error(err.error || `Upload failed (${xhr.status})`));
-            } catch {
-              reject(new Error(`Upload failed with status ${xhr.status}`));
-            }
-          }
-        };
-        xhr.onerror = () => reject(new Error('Network error'));
+      // Extract file info from blob response
+      const fileInfo = {
+        id: file.name.replace(/\.[^.]+$/, '').replace(/[^a-zA-Z0-9]/g, '-'),
+        name: file.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' '),
+        path: blob.url,
+        type: ext.slice(1),
+        description: `Uploaded ${new Date().toISOString()}`,
+        size: file.size,
+      };
 
-        // Use the streaming upload endpoint
-        xhr.open('PUT', `/api/upload-url?filename=${encodeURIComponent(file.name)}`);
-        xhr.setRequestHeader('Content-Type', 'application/octet-stream');
-        xhr.setRequestHeader('x-vercel-filename', file.name);
-        xhr.send(file);
-      });
-
-      if (response.success && onUploadComplete) {
-        onUploadComplete(response.file);
+      if (onUploadComplete) {
+        onUploadComplete(fileInfo);
       }
     } catch (err) {
-      setError(err.message);
+      console.error('Upload error:', err);
+      setError(err.message || 'Upload failed');
     } finally {
       setUploading(false);
       setProgress(0);
