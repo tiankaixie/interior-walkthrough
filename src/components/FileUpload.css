@@ -1,0 +1,87 @@
+/**
+ * Input: none
+ * Output: FileUpload component styles
+ * Pos: CSS for file upload dropzone
+ * If this file is updated, you must update this header and the parent folder's README.md.
+ */
+
+.file-upload-container {
+  margin-bottom: 12px;
+}
+
+.file-upload-dropzone {
+  border: 2px dashed rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.file-upload-dropzone:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.file-upload-dropzone.drag-over {
+  border-color: #4a9eff;
+  background: rgba(74, 158, 255, 0.1);
+}
+
+.file-upload-dropzone.uploading {
+  cursor: default;
+  pointer-events: none;
+}
+
+.upload-icon {
+  font-size: 24px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 8px;
+}
+
+.upload-text {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.upload-hint {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 10px;
+}
+
+.upload-progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #4a9eff;
+  transition: width 0.2s ease;
+}
+
+.progress-text {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 12px;
+  min-width: 40px;
+}
+
+.upload-error {
+  margin-top: 8px;
+  padding: 8px;
+  background: rgba(255, 100, 100, 0.2);
+  border-radius: 4px;
+  color: #ff6b6b;
+  font-size: 11px;
+}

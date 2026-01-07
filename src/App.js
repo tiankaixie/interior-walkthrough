@@ -16,7 +16,7 @@ import { usePointCloudExtractor, COLOR_MODES, calculateBounds } from './hooks/us
 
 function App() {
   // Model manifest and selection
-  const { models, loading: manifestLoading, error: manifestError } = useModelManifest();
+  const { models, loading: manifestLoading, error: manifestError, addModel } = useModelManifest();
   const [selectedModel, setSelectedModel] = useState(null);
 
   // Model loading
@@ -71,6 +71,14 @@ function App() {
     loadModel(model.path);
   }, [loadModel]);
 
+  // Handle file upload complete
+  const handleUploadComplete = useCallback((file) => {
+    addModel(file);
+    // Auto-select the uploaded model
+    setSelectedModel(file);
+    loadModel(file.path);
+  }, [addModel, loadModel]);
+
   // Handle view mode change
   const handleViewModeChange = useCallback((mode) => {
     setViewMode(mode);
@@ -105,6 +113,7 @@ function App() {
         error={manifestError}
         selectedModel={selectedModel}
         onSelect={handleModelSelect}
+        onUploadComplete={handleUploadComplete}
       />
 
       {/* Main 3D Viewer - only render when model selected */}

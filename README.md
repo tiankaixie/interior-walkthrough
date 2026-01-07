@@ -14,15 +14,18 @@ React application using deck.gl v9 with WebGPU support (falls back to WebGL2) fo
 |------|--------|---------------|
 | src/App.js | Active | Main application component |
 | src/App.css | Active | Global styles |
-| src/components/ | Active | UI components (DeckGLViewer, ModelSelector, ControlPanel) |
+| src/components/ | Active | UI components (DeckGLViewer, ModelSelector, ControlPanel, FileUpload) |
 | src/hooks/ | Active | Custom hooks (useFirstPersonControls, useModelLoader, usePointCloudExtractor) |
+| api/ | Active | Vercel serverless functions for file upload |
 | public/models/ | Active | GLB/GLTF model storage |
 | public/models/models-manifest.json | Active | Model listing for dropdown selection |
+| vercel.json | Active | Vercel deployment configuration |
 
 ## Features
 
 - **WebGPU/WebGL2 Rendering**: Automatically uses best available renderer
-- **Model Selection**: Dropdown to select from available GLB/GLTF models
+- **File Upload**: Drag-and-drop or click to upload GLB/GLTF/PLY files
+- **Model Selection**: Dropdown to select from available or uploaded models
 - **Dual View Modes**: Switch between mesh and point cloud visualization
 - **First-Person Controls**: WASD movement + mouse look
 - **Camera Modes**: Free flight and physics-based movement
@@ -53,6 +56,10 @@ yarn build
 
 ## Adding New Models
 
+### Option 1: Upload via UI (Recommended)
+Simply drag-and-drop your file onto the upload area or click to select a file. Uploaded files are stored in Vercel Blob storage and persist across sessions.
+
+### Option 2: Static Files
 1. Add your GLB/GLTF/PLY file to `public/models/`
 2. Update `public/models/models-manifest.json`:
 
@@ -80,6 +87,26 @@ yarn build
 Supported formats:
 - **GLB/GLTF**: 3D mesh models (with optional Draco compression)
 - **PLY**: Point cloud files (ASCII or binary, with optional colors/normals)
+
+## Deployment
+
+### Vercel (Recommended)
+
+1. Connect your repository to Vercel
+2. Add environment variable: `BLOB_READ_WRITE_TOKEN` (from Vercel Blob storage)
+3. Deploy
+
+```bash
+# Or deploy via CLI
+npm i -g vercel
+vercel
+```
+
+### GitHub Pages (Static only, no upload)
+
+```bash
+npm run deploy
+```
 
 ## Technology Stack
 

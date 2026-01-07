@@ -1,13 +1,14 @@
 /**
- * Input: models list, onSelect callback
- * Output: Dropdown UI for model selection
+ * Input: models list, onSelect callback, onUploadComplete callback
+ * Output: Dropdown UI for model selection with upload support
  * Pos: Model selection component displayed at startup
  * If this file is updated, you must update this header and the parent folder's README.md.
  */
 
 import React, { useState } from 'react';
+import { FileUpload } from './FileUpload';
 
-export function ModelSelector({ models, loading, error, onSelect, selectedModel }) {
+export function ModelSelector({ models, loading, error, onSelect, selectedModel, onUploadComplete }) {
   const [isOpen, setIsOpen] = useState(!selectedModel);
 
   const handleSelect = (model) => {
@@ -38,13 +39,27 @@ export function ModelSelector({ models, loading, error, onSelect, selectedModel 
     );
   }
 
+  // Helper to get icon for model type
+  const getModelIcon = (model) => {
+    if (model.type === 'ply') return '☁️';
+    if (model.type === 'glb') return '📦';
+    return '🏛️';
+  };
+
   // Only show overlay if no model selected
   if (!selectedModel && isOpen) {
     return (
       <div className="model-selector-overlay">
         <div className="model-selector-modal">
           <h2>Select a Model</h2>
-          <p className="subtitle">Choose a 3D model to view</p>
+          <p className="subtitle">Choose a 3D model or upload your own</p>
+
+          {/* File Upload */}
+          <FileUpload onUploadComplete={onUploadComplete} />
+
+          <div className="divider">
+            <span>or select existing</span>
+          </div>
 
           <div className="model-list">
             {models.map((model) => (
@@ -54,11 +69,14 @@ export function ModelSelector({ models, loading, error, onSelect, selectedModel 
                 onClick={() => handleSelect(model)}
               >
                 <div className="model-icon">
-                  {model.type === 'glb' ? '📦' : '🏛️'}
+                  {getModelIcon(model)}
                 </div>
                 <div className="model-info">
                   <span className="model-name">{model.name}</span>
-                  <span className="model-type">{model.type.toUpperCase()}</span>
+                  <span className="model-type">
+                    {model.type.toUpperCase()}
+                    {model.source === 'uploaded' && ' · Uploaded'}
+                  </span>
                   {model.description && (
                     <span className="model-description">{model.description}</span>
                   )}
@@ -68,7 +86,7 @@ export function ModelSelector({ models, loading, error, onSelect, selectedModel 
           </div>
 
           {models.length === 0 && (
-            <p className="no-models">No models found in manifest.</p>
+            <p className="no-models">No models available. Upload a file to get started.</p>
           )}
         </div>
       </div>
@@ -95,7 +113,7 @@ export function ModelSelector({ models, loading, error, onSelect, selectedModel 
               onClick={() => handleSelect(model)}
             >
               <span className="model-icon-small">
-                {model.type === 'glb' ? '📦' : '🏛️'}
+                {getModelIcon(model)}
               </span>
               <span>{model.name}</span>
             </button>

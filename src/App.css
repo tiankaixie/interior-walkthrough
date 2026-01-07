@@ -150,6 +150,26 @@ html, body, #root {
   padding: 24px;
 }
 
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 16px 0;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 12px;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.divider span {
+  padding: 0 12px;
+}
+
 /* Compact Model Selector */
 .model-selector-compact {
   position: fixed;

@@ -309,32 +309,61 @@ function extractMeshes(gltf) {
 }
 
 /**
- * Hook to fetch available models from manifest
+ * Hook to fetch available models from API and manifest
  */
 export function useModelManifest() {
   const [models, setModels] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchManifest = async () => {
-      try {
-        const response = await fetch(`${process.env.PUBLIC_URL}/models/models-manifest.json`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch model manifest');
-        }
-        const data = await response.json();
-        setModels(data.models || []);
-      } catch (err) {
-        console.error('Error loading model manifest:', err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchModels = useCallback(async () => {
+    setLoading(true);
+    try {
+      const allModels = [];
 
-    fetchManifest();
+      // Try to fetch from API (uploaded models)
+      try {
+        const apiResponse = await fetch('/api/models');
+        if (apiResponse.ok) {
+          const apiData = await apiResponse.json();
+          if (apiData.models) {
+            allModels.push(...apiData.models.map(m => ({ ...m, source: 'uploaded' })));
+          }
+        }
+      } catch (apiErr) {
+        console.log('API not available, using manifest only');
+      }
+
+      // Fetch from static manifest
+      try {
+        const manifestResponse = await fetch(`${process.env.PUBLIC_URL}/models/models-manifest.json`);
+        if (manifestResponse.ok) {
+          const manifestData = await manifestResponse.json();
+          if (manifestData.models) {
+            allModels.push(...manifestData.models.map(m => ({ ...m, source: 'static' })));
+          }
+        }
+      } catch (manifestErr) {
+        console.log('Manifest not available');
+      }
+
+      setModels(allModels);
+      setError(null);
+    } catch (err) {
+      console.error('Error loading models:', err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  return { models, loading, error };
+  useEffect(() => {
+    fetchModels();
+  }, [fetchModels]);
+
+  const addModel = useCallback((model) => {
+    setModels(prev => [{ ...model, source: 'uploaded' }, ...prev]);
+  }, []);
+
+  return { models, loading, error, refetch: fetchModels, addModel };
 }
