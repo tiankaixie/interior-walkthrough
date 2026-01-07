@@ -1,7 +1,7 @@
 {
   "name": "interior-walkthrough",
   "version": "0.2.0",
-  "homepage": "https://yuri7718.github.io/interior-walkthrough",
+  "homepage": "https://tiankaixie.github.io/interior-walkthrough",
   "private": true,
   "dependencies": {
     "@deck.gl/core": "^8.9.0",
