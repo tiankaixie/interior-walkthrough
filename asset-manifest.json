@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/interior-walkthrough/static/css/main.dccab97d.css",
+    "main.js": "/interior-walkthrough/static/js/main.c9c610dd.js",
+    "static/js/453.821401fa.chunk.js": "/interior-walkthrough/static/js/453.821401fa.chunk.js",
+    "index.html": "/interior-walkthrough/index.html",
+    "main.dccab97d.css.map": "/interior-walkthrough/static/css/main.dccab97d.css.map",
+    "main.c9c610dd.js.map": "/interior-walkthrough/static/js/main.c9c610dd.js.map",
+    "453.821401fa.chunk.js.map": "/interior-walkthrough/static/js/453.821401fa.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.dccab97d.css",
+    "static/js/main.c9c610dd.js"
+  ]
+}
