@@ -1,11 +1,11 @@
 /**
- * Input: filename query parameter
+ * Input: JSON body from client upload SDK
  * Output: JSON with client upload token
  * Pos: Vercel serverless function to generate client upload token
  * If this file is updated, you must update this header and the parent folder's README.md.
  */
 
-import { handleUpload } from '@vercel/blob';
+import { handleUpload } from '@vercel/blob/client';
 
 export default async function handler(req, res) {
   // Set CORS headers
@@ -15,6 +15,10 @@ export default async function handler(req, res) {
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
+  }
+
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
@@ -42,7 +46,6 @@ export default async function handler(req, res) {
             'model/gltf+json',
             'application/octet-stream',
           ],
-          maximumSizeInBytes: 500 * 1024 * 1024, // 500MB max
         };
       },
       onUploadCompleted: async ({ blob }) => {
