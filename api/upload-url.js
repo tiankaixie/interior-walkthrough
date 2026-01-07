@@ -5,7 +5,7 @@
  * If this file is updated, you must update this header and the parent folder's README.md.
  */
 
-import { handleUpload } from '@vercel/blob/client';
+import { handleUpload } from '@vercel/blob';
 
 export default async function handler(req, res) {
   // Set CORS headers
@@ -18,6 +18,12 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Check if BLOB token is configured
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      console.error('BLOB_READ_WRITE_TOKEN is not configured');
+      return res.status(500).json({ error: 'Server configuration error: Blob storage not configured' });
+    }
+
     const jsonResponse = await handleUpload({
       body: req.body,
       request: req,
@@ -46,7 +52,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json(jsonResponse);
   } catch (error) {
-    console.error('Upload token error:', error.message);
-    return res.status(400).json({ error: error.message });
+    console.error('Upload token error:', error.message, error.stack);
+    return res.status(500).json({ error: error.message });
   }
 }
