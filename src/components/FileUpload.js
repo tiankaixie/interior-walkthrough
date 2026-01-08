@@ -8,7 +8,10 @@
 import React, { useState, useRef } from 'react';
 import './FileUpload.css';
 
-export function FileUpload({ onUploadComplete }) {
+// API base URL - use environment variable or default to same origin
+const API_BASE = process.env.REACT_APP_API_URL || '';
+
+export function FileUpload({ onUploadComplete, authToken }) {
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState(null);
@@ -31,6 +34,7 @@ export function FileUpload({ onUploadComplete }) {
     setProgress(0);
 
     try {
+      // Use FormData for server upload
       const formData = new FormData();
       formData.append('file', file);
 
@@ -45,18 +49,25 @@ export function FileUpload({ onUploadComplete }) {
       const response = await new Promise((resolve, reject) => {
         xhr.onload = () => {
           if (xhr.status >= 200 && xhr.status < 300) {
-            resolve(JSON.parse(xhr.responseText));
+            try {
+              resolve(JSON.parse(xhr.responseText));
+            } catch {
+              reject(new Error('Invalid server response'));
+            }
           } else {
             try {
               const err = JSON.parse(xhr.responseText);
-              reject(new Error(err.error || 'Upload failed'));
+              reject(new Error(err.error || `Upload failed (${xhr.status})`));
             } catch {
-              reject(new Error('Upload failed'));
+              reject(new Error(`Upload failed with status ${xhr.status}`));
             }
           }
         };
         xhr.onerror = () => reject(new Error('Network error'));
-        xhr.open('POST', '/api/upload');
+        xhr.open('POST', `${API_BASE}/api/upload`);
+        if (authToken) {
+          xhr.setRequestHeader('Authorization', `Bearer ${authToken}`);
+        }
         xhr.send(formData);
       });
 
@@ -64,7 +75,8 @@ export function FileUpload({ onUploadComplete }) {
         onUploadComplete(response.file);
       }
     } catch (err) {
-      setError(err.message);
+      console.error('Upload error:', err);
+      setError(err.message || 'Upload failed');
     } finally {
       setUploading(false);
       setProgress(0);
