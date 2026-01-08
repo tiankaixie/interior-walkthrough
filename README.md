@@ -1,146 +1,120 @@
 Once the contents of this folder change, update this document.
 
-# deck.gl GLB Viewer
+# deck.gl 3D Model Viewer
 
-A WebGPU-accelerated 3D model viewer built with deck.gl and React. Supports GLB/GLTF meshes and PLY point clouds with first-person navigation controls and a modern control panel.
+A 3D model viewer built with deck.gl and React. Supports GLB/GLTF meshes and PLY point clouds with first-person navigation controls.
+
+## Quick Start
+
+### Option 1: View Only (No Upload)
+
+```bash
+yarn install && yarn start
+```
+
+Opens http://localhost:3000 automatically.
+
+### Option 2: Full Features (With File Upload)
+
+```bash
+# macOS/Linux - one command
+yarn install && cd server && npm install && cd .. && \
+npm start --prefix server & REACT_APP_API_URL=http://localhost:3001 yarn start
+```
+
+Windows PowerShell:
+```powershell
+yarn install; cd server; npm install; cd ..; Start-Process npm -ArgumentList "start","--prefix","server"; $env:REACT_APP_API_URL="http://localhost:3001"; yarn start
+```
+
+Frontend: http://localhost:3000 | Backend: http://localhost:3001
+
+**Upload Password**: `admin123` (change via `ADMIN_PASSWORD` env variable)
 
 ## Architecture
 
-React application using deck.gl v9 with WebGPU support (falls back to WebGL2) for rendering GLB/GLTF models. Supports both mesh and point cloud visualization modes with WASD + mouse navigation.
+React + deck.gl v8 + Express backend. Frontend renders 3D models, backend handles file uploads.
 
-## File Registry
+## File Structure
 
-| Name | Status | Core Function |
-|------|--------|---------------|
-| src/App.js | Active | Main application component |
-| src/App.css | Active | Global styles |
-| src/components/ | Active | UI components (DeckGLViewer, ModelSelector, ControlPanel, FileUpload) |
-| src/hooks/ | Active | Custom hooks (useFirstPersonControls, useModelLoader, usePointCloudExtractor) |
-| api/ | Active | Vercel serverless functions for file upload |
-| public/models/ | Active | GLB/GLTF model storage |
-| public/models/models-manifest.json | Active | Model listing for dropdown selection |
-| vercel.json | Active | Vercel deployment configuration |
-
-## Features
-
-- **WebGPU/WebGL2 Rendering**: Automatically uses best available renderer
-- **File Upload**: Drag-and-drop or click to upload GLB/GLTF/PLY files
-- **Model Selection**: Dropdown to select from available or uploaded models
-- **Dual View Modes**: Switch between mesh and point cloud visualization
-- **First-Person Controls**: WASD movement + mouse look
-- **Camera Modes**: Free flight and physics-based movement
-- **Control Panel**: Adjust point size, color mode, LOD, rendering quality
+| Name | Purpose |
+|------|---------|
+| src/App.js | Main application component |
+| src/components/ | UI components (DeckGLViewer, ModelSelector, ControlPanel, FileUpload, LoginModal) |
+| src/hooks/ | Custom hooks (useFirstPersonControls, useModelLoader, usePointCloudExtractor) |
+| server/index.js | Express upload server |
+| public/models/ | Static model files |
+| public/models/uploads/ | User uploaded models |
 
 ## Controls
 
 | Key | Action |
 |-----|--------|
 | W/A/S/D | Move forward/left/backward/right |
-| Space | Ascend (free flight) / Jump (physics) |
+| Space | Ascend (free flight) / Jump (physics mode) |
 | Shift | Descend (free flight) |
-| Mouse | Look around (after clicking to lock) |
+| Mouse | Look around (click to lock cursor) |
 | ESC | Unlock cursor |
 
-## Getting Started
+## Features
 
-```bash
-# Install frontend dependencies
-yarn install
+- GLB/GLTF mesh models and PLY point clouds
+- First-person WASD + mouse controls
+- Drag-and-drop file upload (requires login)
+- Control panel for point size, color mode, etc.
 
-# Start frontend development server
-yarn start
+## Adding Models
 
-# Build frontend for production
-yarn build
-```
+### Upload (Recommended)
+1. Click login in top-right, enter password `admin123`
+2. Drag file to upload area or click to select
 
-### With File Upload Server
-
-To enable file uploads, run the backend server alongside the frontend:
-
-```bash
-# Terminal 1: Start backend server
-cd server
-npm install
-npm start
-# Server runs on http://localhost:3001
-
-# Terminal 2: Start frontend with API proxy
-REACT_APP_API_URL=http://localhost:3001 yarn start
-```
-
-For production deployment, configure your web server (nginx, etc.) to:
-1. Serve the built frontend from `build/`
-2. Proxy `/api/*` requests to the Node.js server
-3. Serve uploaded files from `public/models/uploads/`
-
-## Adding New Models
-
-### Option 1: Upload via UI (Recommended)
-Simply drag-and-drop your file onto the upload area or click to select a file. Uploaded files are stored in Vercel Blob storage and persist across sessions.
-
-### Option 2: Static Files
-1. Add your GLB/GLTF/PLY file to `public/models/`
-2. Update `public/models/models-manifest.json`:
+### Static Files
+1. Place file in `public/models/`
+2. Edit `public/models/models-manifest.json`:
 
 ```json
 {
   "models": [
     {
-      "id": "your-model-id",
+      "id": "model-id",
       "name": "Display Name",
       "path": "/models/your-model.glb",
-      "type": "glb",
-      "description": "Optional description"
-    },
-    {
-      "id": "your-pointcloud-id",
-      "name": "Point Cloud Name",
-      "path": "/models/your-pointcloud.ply",
-      "type": "ply",
-      "description": "PLY point cloud file"
+      "type": "glb"
     }
   ]
 }
 ```
 
-Supported formats:
-- **GLB/GLTF**: 3D mesh models (with optional Draco compression)
-- **PLY**: Point cloud files (ASCII or binary, with optional colors/normals)
+## Supported Formats
+
+- **GLB/GLTF**: 3D mesh models (with Draco compression support)
+- **PLY**: Point cloud files (ASCII or binary, with colors/normals)
 
 ## Deployment
 
-### Vercel (Recommended)
-
-1. Connect your repository to Vercel
-2. Add environment variable: `BLOB_READ_WRITE_TOKEN` (from Vercel Blob storage)
-3. Deploy
+### Local Production
 
 ```bash
-# Or deploy via CLI
-npm i -g vercel
-vercel
+yarn build
+cd server && ADMIN_PASSWORD=your_password npm start
+# Configure nginx to proxy /api/* to localhost:3001, serve static files from build/
 ```
 
-### GitHub Pages (Static only, no upload)
+### GitHub Pages (Static Only)
 
 ```bash
 npm run deploy
 ```
 
-## Technology Stack
+## Tech Stack
 
 - React 18
-- deck.gl v9 (WebGPU/WebGL2)
-- luma.gl v9 (WebGPU adapter)
+- deck.gl v8 / luma.gl v8
 - loaders.gl (GLB/GLTF/PLY loading)
-- cannon-es (physics, optional)
+- Express + Multer (file upload)
+- cannon-es (optional physics)
 
 ## Browser Support
 
-- Chrome 113+ (WebGPU)
-- Edge 113+ (WebGPU)
-- Firefox (WebGL2 fallback)
-- Safari (WebGL2 fallback)
-
-WebGPU requires HTTPS in production (localhost works for development).
+Chrome, Edge, Firefox, Safari (WebGL2)
