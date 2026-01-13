@@ -109,7 +109,7 @@ npm run deploy
 
 ## Tech Stack
 
-- React 18
+- React 19
 - deck.gl v8 / luma.gl v8
 - loaders.gl (GLB/GLTF/PLY loading)
 - Express + Multer (file upload)
