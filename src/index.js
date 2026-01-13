@@ -1,4 +1,11 @@
-import React, {Suspense} from 'react';
+/**
+ * Input: None
+ * Output: React application mount point
+ * Pos: Entry point that renders the app
+ * If this file is updated, you must update this header and the parent folder's README.md.
+ */
+
+import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
@@ -7,8 +14,8 @@ import reportWebVitals from './reportWebVitals';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-  <Suspense fallback={null}>
-    <App />
+    <Suspense fallback={null}>
+      <App />
     </Suspense>
   </React.StrictMode>
 );

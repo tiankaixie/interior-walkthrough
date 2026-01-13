@@ -1,70 +1,120 @@
-# Getting Started with Create React App
+Once the contents of this folder change, update this document.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# deck.gl 3D Model Viewer
 
-## Available Scripts
+A 3D model viewer built with deck.gl and React. Supports GLB/GLTF meshes and PLY point clouds with first-person navigation controls.
 
-In the project directory, you can run:
+## Quick Start
 
-### `npm start`
+### Option 1: View Only (No Upload)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+```bash
+yarn install && yarn start
+```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Opens http://localhost:3000 automatically.
 
-### `npm test`
+### Option 2: Full Features (With File Upload)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```bash
+# macOS/Linux - one command
+yarn install && cd server && npm install && cd .. && \
+npm start --prefix server & REACT_APP_API_URL=http://localhost:3001 yarn start
+```
 
-### `npm run build`
+Windows PowerShell:
+```powershell
+yarn install; cd server; npm install; cd ..; Start-Process npm -ArgumentList "start","--prefix","server"; $env:REACT_APP_API_URL="http://localhost:3001"; yarn start
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Frontend: http://localhost:3000 | Backend: http://localhost:3001
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+**Upload Password**: `admin123` (change via `ADMIN_PASSWORD` env variable)
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Architecture
 
-### `npm run eject`
+React + deck.gl v8 + Express backend. Frontend renders 3D models, backend handles file uploads.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## File Structure
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+| Name | Purpose |
+|------|---------|
+| src/App.js | Main application component |
+| src/components/ | UI components (DeckGLViewer, ModelSelector, ControlPanel, FileUpload, LoginModal) |
+| src/hooks/ | Custom hooks (useFirstPersonControls, useModelLoader, usePointCloudExtractor) |
+| server/index.js | Express upload server |
+| public/models/ | Static model files |
+| public/models/uploads/ | User uploaded models |
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Controls
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+| Key | Action |
+|-----|--------|
+| W/A/S/D | Move forward/left/backward/right |
+| Space | Ascend (free flight) / Jump (physics mode) |
+| Shift | Descend (free flight) |
+| Mouse | Look around (click to lock cursor) |
+| ESC | Unlock cursor |
 
-## Learn More
+## Features
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- GLB/GLTF mesh models and PLY point clouds
+- First-person WASD + mouse controls
+- Drag-and-drop file upload (requires login)
+- Control panel for point size, color mode, etc.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Adding Models
 
-### Code Splitting
+### Upload (Recommended)
+1. Click login in top-right, enter password `admin123`
+2. Drag file to upload area or click to select
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Static Files
+1. Place file in `public/models/`
+2. Edit `public/models/models-manifest.json`:
 
-### Analyzing the Bundle Size
+```json
+{
+  "models": [
+    {
+      "id": "model-id",
+      "name": "Display Name",
+      "path": "/models/your-model.glb",
+      "type": "glb"
+    }
+  ]
+}
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Supported Formats
 
-### Making a Progressive Web App
+- **GLB/GLTF**: 3D mesh models (with Draco compression support)
+- **PLY**: Point cloud files (ASCII or binary, with colors/normals)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## Deployment
 
-### Advanced Configuration
+### Local Production
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+```bash
+yarn build
+cd server && ADMIN_PASSWORD=your_password npm start
+# Configure nginx to proxy /api/* to localhost:3001, serve static files from build/
+```
 
-### Deployment
+### GitHub Pages (Static Only)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+```bash
+npm run deploy
+```
 
-### `npm run build` fails to minify
+## Tech Stack
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- React 18
+- deck.gl v8 / luma.gl v8
+- loaders.gl (GLB/GLTF/PLY loading)
+- Express + Multer (file upload)
+- cannon-es (optional physics)
+
+## Browser Support
+
+Chrome, Edge, Firefox, Safari (WebGL2)
